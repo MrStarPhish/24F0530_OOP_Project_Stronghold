@@ -30,10 +30,7 @@ Game::Game()
 	displayFrame();
 }
 
-Game::~Game()
-{
-	//
-}
+
 
 void Game::displayFrame()
 {

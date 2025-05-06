@@ -8,7 +8,10 @@ int main()
 {
 
 	Game game;
-
+	gotoxy(0, 0);
+	cout << "OOOOO" << endl;
+	cout << "OOOOO" << endl;
+	cout << "OOOOO" << endl;
 
 
 	cout << endl;
