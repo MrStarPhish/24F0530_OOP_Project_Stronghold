@@ -10,8 +10,17 @@ const int FRAME_COLS = 200;
 const int FRAME_X_OFFSET = 0;
 const int FRAME_Y_OFFSET = 5;
 
+const int WORLD_START_X = FRAME_X_OFFSET + 1;
+const int WORLD_START_Y = FRAME_Y_OFFSET + 1;
+
+const int TILE_WIDTH = 5;
+const int TILE_LENGTH = 3;
+
+
 void gotoxy(int x, int y);
 void setColor(int color);
+void hideCursor();
+
 
 struct Coords;
 class Game;
@@ -27,7 +36,7 @@ enum Color
 
 enum Terrain
 {
-	GRASS, PATH, STRUCTURE
+	PATH_X, PATH_Y, STRUCTURE, EMPTY
 };
 
 struct Coords
@@ -54,7 +63,23 @@ public:
 
 class World
 {
+public:
+	// FRAME ke andar jo saara gameplay ho ga
+	const Coords starting; // start inside the Frame
 	Tile*** tiles; // 2D array of Tiles Pointer
+
+	World();
+	~World();
+
+	void loadPreset1();
+
+	void display();
+	void initializeTiles();
+	void createTiles();
+	void displayTiles();
+	void placeBuilding(Building*);
+	Building* createBuilding(int, int, int, int, char);
+	void displayBuildings();
 };
 
 class Game
@@ -67,21 +92,50 @@ public:
 
 	Game();
 	void displayFrame();
+	void displayWorld();
 };
 
 
 
 class Tile
 {
+public:
 	// The smallest storing Unit for the game...like, a Tile could be 5x5 characters.
-	Coords position; // top left corner aka starting position's coords
+	const Coords position; // top left corner aka starting position's coords
 	bool isOccupied;
 	Building* building; // the building that will be stored here (if any)
 	Terrain type;
+	int ID;
+
+	static int TileCount;
+
+	Tile();
+	Tile(int x, int y);
+	void displayTile();
+	void displayEmptyTile();
+	void displayPathXTile();
+	void displayPathYTile();
+
 };
 
 class Building
 {
-	Coords position; // starting position's coords
+public:
+	Coords position; // starting Tile
 	int width, height; // the size of the building, in terms of TIle
+	char type;
+
+	Building();
+	Building(int, int, int, int, char = '\0');
+	virtual void displayBuilding(); // #POLYMORPHISM
+
+};
+
+
+class Farm : public Building  
+{
+public:
+	Farm(int, int, int, int, char);
+
+	void displayBuilding();
 };

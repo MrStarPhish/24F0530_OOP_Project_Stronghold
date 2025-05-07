@@ -6,12 +6,11 @@ using namespace std;
 
 int main()
 {
+	hideCursor();
+	ios::sync_with_stdio(false);
 
 	Game game;
-	gotoxy(0, 0);
-	cout << "OOOOO" << endl;
-	cout << "OOOOO" << endl;
-	cout << "OOOOO" << endl;
+	
 
 
 	cout << endl;
