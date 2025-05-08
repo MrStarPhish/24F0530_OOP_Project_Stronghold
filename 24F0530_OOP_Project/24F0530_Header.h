@@ -72,6 +72,7 @@ public:
 	~World();
 
 	void loadPreset1();
+	void loadPreset1Labels();
 
 	void display();
 	void initializeTiles();
@@ -135,7 +136,48 @@ public:
 class Farm : public Building  
 {
 public:
+	// Farm, source of revenue, variable size
 	Farm(int, int, int, int, char);
+
+	void displayBuilding();
+};
+
+class Castle : public Building {
+public:
+	// A 3x3 building be default
+	Castle(int w, int h, int x, int y, char c);
+
+	void displayBuilding();
+};
+
+class Barracks : public Building {
+public:
+	// A big building that represents soldiers 2x3 by default
+	Barracks(int w, int h, int x, int y, char c);
+
+	void displayBuilding();
+};
+
+class Market : public Building {
+public:
+	// A big building that represents soldiers 2x3 by default
+	Market(int w, int h, int x, int y, char c);
+
+	void displayBuilding();
+};
+
+class Tradepost : public Building {
+public:
+	// A big building that represents soldiers 2x3 by default
+	Tradepost(int w, int h, int x, int y, char c);
+
+	void displayBuilding();
+};
+
+class Bank : public Building {
+public:
+	// A big building that represents soldiers 2x3 by default
+	Bank(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
 };

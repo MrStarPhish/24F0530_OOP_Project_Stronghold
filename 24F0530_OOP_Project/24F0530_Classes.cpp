@@ -31,6 +31,7 @@ Game::Game()
 	displayFrame();
 	world.loadPreset1();
 	displayWorld();
+	world.loadPreset1Labels();
 	
 }
 
@@ -85,32 +86,93 @@ World::World() : starting(WORLD_START_X, WORLD_START_Y)
 	initializeTiles();
 }
 
+void World::loadPreset1Labels()
+{
+
+	int maxRows = FRAME_ROWS / TILE_LENGTH; // here rows and cols mean TILES
+	int maxCols = FRAME_COLS / TILE_WIDTH;
+
+	gotoxy((maxCols - 6) * TILE_WIDTH, (maxRows)*TILE_LENGTH + 2);
+	cout << "EMPIRE-B";
+	gotoxy(WORLD_START_X + 19, WORLD_START_Y + 3);
+	cout << "EMPIRE-A";
+	gotoxy(WORLD_START_X + 160, WORLD_START_Y + 3);  // near bottom-left corner
+	cout << "TRADE CENTER";
+	gotoxy(WORLD_START_X + 19, (maxRows-1)*TILE_LENGTH);
+	cout << "BATTLEFIELD";
+}
+
 void World::loadPreset1()
 {
-	// Example: Place a 3x2 building at tile[5][10]
-	Building* b1 = createBuilding(3, 2, 10, 5, 'f');
-	placeBuilding(b1);
 
-	// Example: Another building at tile[15][20]
-	Building* b2 = createBuilding(4, 3, 20, 15, 'f');
-	placeBuilding(b2);
+	int maxRows = FRAME_ROWS / TILE_LENGTH; // here rows and cols mean TILES
+	int maxCols = FRAME_COLS / TILE_WIDTH;
 
-	// Example: Create a horizontal path from tile[8][0] to tile[8][9]
-	for (int x = 0; x < 10; ++x) {
-		tiles[8][x]->type = PATH_X;
-		tiles[8][x]->isOccupied = false;
-		tiles[8][x]->building = nullptr;
+	
+	// EMPIRE - A 
+
+	Building* aCastle = createBuilding(3, 3, 1, 2, 'C'); // a 3x3 Castle starting at Tile(1,2)
+	placeBuilding(aCastle);
+
+	Building* aBarracks = createBuilding(2, 3, 6, 2, 'B');
+	placeBuilding(aBarracks);
+
+	Building* aFarm1 = createBuilding(2, 2, 2, 6, 'F');
+	placeBuilding(aFarm1);
+
+	Building* aFarm2 = createBuilding(3, 2, 5, 6, 'F');
+	placeBuilding(aFarm2);
+
+	// EMPIRE - B
+
+	Building* bCastle = createBuilding(3, 3, maxCols - 5, maxRows - 5, 'C');
+	placeBuilding(bCastle);
+
+	Building* bBarracks = createBuilding(2, 3, maxCols - 8, maxRows - 5, 'B');
+	placeBuilding(bBarracks);
+
+	Building* bFarm1 = createBuilding(2, 2, maxCols - 5, maxRows - 8, 'F');
+	placeBuilding(bFarm1);
+
+	Building* bFarm2 = createBuilding(3, 1, maxCols - 9, maxRows - 9, 'F');
+	placeBuilding(bFarm2);
+
+
+	// THe Paths
+	int midY = maxRows / 2;
+
+	for (int x = 0; x < maxCols; ++x) // Horizontral Path in Mid
+	{
+		tiles[midY][x]->type = PATH_X;
 	}
 
-	// Example: Vertical path from tile[8][9] to tile[14][9]
-	for (int y = 9; y <= 14; ++y) {
-		tiles[y][10]->type = PATH_Y;
-		tiles[y][10]->isOccupied = false;
-		tiles[y][10]->building = nullptr;
+	for (int y = 2; y < midY; ++y) // Vertical path from Castle A to center
+	{
+		tiles[y][4]->type = PATH_Y;
 	}
 
-	// You can add more preset layout designs here...
+	for (int y = midY+1; y < maxRows-2; y++) // // Vertical path from Castle B to center
+	{
+		tiles[y][maxCols-6]->type = PATH_Y;
+	}
+
+	tiles[midY][4] -> type = EMPTY; // placing the intersections for better visibility
+	tiles[midY][maxCols-6]->type = EMPTY;
+
+	// TRADE CENTER or Market Place
+
+	Building* marketplace = createBuilding(3, 2, maxCols - 6, 3, 'M'); // 'M' for Marketplace
+	placeBuilding(marketplace);
+
+	Building* tradePost = createBuilding(2, 2, maxCols - 9, 7, 'T');   // 'T' for Trade Post
+	placeBuilding(tradePost);
+
+	Building* bank = createBuilding(2, 2, maxCols - 9, 2, 'N');       // 'B' for Bank
+	placeBuilding(bank);
+
+	
 }
+
 
 void World::display()
 {
@@ -304,6 +366,28 @@ Building* World::createBuilding(int w, int h, int x, int y, char c)
 	case 'F':
 		return new Farm(w, h, x, y, c);
 		break;
+	case 'c':
+	case 'C':
+		return new Castle(w, h, x, y, c);
+		break;
+	case 'b':
+	case 'B':
+		return new Barracks(w, h, x, y, c);
+		break;
+	case 'm':
+	case 'M':
+		return new Market(w, h, x, y, c);
+		break;
+	case 't':
+	case 'T':
+		return new Tradepost(w, h, x, y, c);
+		break;
+	case 'n':
+	case 'N':
+		return new Bank(w, h, x, y, c);
+		break;
+	default:
+		return nullptr;
 	}
 }
 
@@ -334,10 +418,14 @@ Farm::Farm(int w, int h, int x, int y, char c)
 
 void Farm::displayBuilding()
 {
-	int x = TILE_WIDTH * position.x; // storing character coordinates
-	int y = TILE_LENGTH * position.y;
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
 	int w = TILE_WIDTH * width; // storing character length and width
 	int l = TILE_LENGTH * height;
+
+	setColor(GREEN);
+
+	int mid_y = (l - 1) / 2 + y;
 
 	for (int i = 0; i < l; i++)
 	{	
@@ -356,10 +444,222 @@ void Farm::displayBuilding()
 			cout << "|";
 		}
 	}
+	setColor(DEFAULT);
+	gotoxy(x+1, mid_y);
+	cout << setw(w-2) << left <<"FARM";
 }
 
+Castle::Castle(int w, int h, int x, int y, char c)
+{
+	width = w;
+	height = h;
+	position.set(x, y); // in terms of Tile
+	type = c;
+}
 
+void Castle::displayBuilding()
+{
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
+	int w = TILE_WIDTH * width; // storing character length and width
+	int l = TILE_LENGTH * height;
 
+	setColor(SKYBLUE);
+
+	int mid_y = (l - 1) / 2 + y;
+
+	for (int i = 0; i < l; i++)
+	{
+		gotoxy(x, y + i);
+		if (i == 0)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "^";
+			}
+		}
+		else if (i + 1 == l)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "-";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + w - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
+	gotoxy(x + 1, mid_y);
+	cout << setw(w - 2) << left << "CASTLE";
+}
+
+Barracks::Barracks(int w, int h, int x, int y, char c)
+{
+	width = w;
+	height = h;
+	position.set(x, y); // in terms of Tile
+	type = c;
+}
+
+void Barracks::displayBuilding()
+{
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
+	int w = TILE_WIDTH * width; // storing character length and width
+	int l = TILE_LENGTH * height;
+
+	setColor(RED);
+
+	int mid_y = (l - 1) / 2 + y;
+
+	for (int i = 0; i < l; i++)
+	{
+		gotoxy(x, y + i);
+		if (i == 0 || i + 1 == l)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "^";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + w - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
+	gotoxy(x + 1, mid_y);
+	cout << setw(w - 2) << left << "BARRACKS";
+}
+
+Market::Market(int w, int h, int x, int y, char c)
+{
+	width = w;
+	height = h;
+	position.set(x, y); // in terms of Tile
+	type = c;
+}
+
+void Market::displayBuilding()
+{
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
+	int w = TILE_WIDTH * width; // storing character length and width
+	int l = TILE_LENGTH * height;
+
+	setColor(RED);
+
+	int mid_y = (l - 1) / 2 + y;
+
+	for (int i = 0; i < l; i++)
+	{
+		gotoxy(x, y + i);
+		if (i == 0 || i + 1 == l)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "^";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + w - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
+	gotoxy(x + 1, mid_y);
+	cout << setw(w - 2) << left << "MARKET";
+}
+
+Tradepost::Tradepost(int w, int h, int x, int y, char c)
+{
+	width = w;
+	height = h;
+	position.set(x, y); // in terms of Tile
+	type = c;
+}
+
+void Tradepost::displayBuilding()
+{
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
+	int w = TILE_WIDTH * width; // storing character length and width
+	int l = TILE_LENGTH * height;
+
+	setColor(SKYBLUE);
+
+	int mid_y = (l - 1) / 2 + y;
+
+	for (int i = 0; i < l; i++)
+	{
+		gotoxy(x, y + i);
+		if (i == 0 || i + 1 == l)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "^";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + w - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
+	gotoxy(x + 1, mid_y);
+	cout << setw(w - 2) << left << "TRADEPOST";
+}
+
+Bank::Bank(int w, int h, int x, int y, char c)
+{
+	width = w;
+	height = h;
+	position.set(x, y); // in terms of Tile
+	type = c;
+}
+
+void Bank::displayBuilding()
+{
+	int x = WORLD_START_X + (TILE_WIDTH * position.x); // storing character coordinates
+	int y = WORLD_START_Y + (TILE_LENGTH * position.y);
+	int w = TILE_WIDTH * width; // storing character length and width
+	int l = TILE_LENGTH * height;
+
+	setColor(GREEN);
+
+	int mid_y = (l - 1) / 2 + y;
+
+	for (int i = 0; i < l; i++)
+	{
+		gotoxy(x, y + i);
+		if (i == 0 || i + 1 == l)
+		{
+			for (int j = 0; j < w; j++)
+			{
+				cout << "^";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + w - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
+	gotoxy(x + 1, mid_y);
+	cout << setw(w - 2) << left << "BANK $";
+}
 
 
 

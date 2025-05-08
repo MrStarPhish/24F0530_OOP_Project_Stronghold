@@ -13,6 +13,7 @@ int main()
 	
 
 
+	gotoxy(0, 70);
 	cout << endl;
 	system("pause");
 	return 0;
