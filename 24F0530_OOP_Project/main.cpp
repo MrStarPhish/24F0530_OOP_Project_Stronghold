@@ -8,8 +8,13 @@ int main()
 {
 	hideConsoleCursor();
 	ios::sync_with_stdio(false);
-
 	Game game;
+
+	while (true)
+	{
+		gotoxy(0, 70);
+
+	}
 	
 
 

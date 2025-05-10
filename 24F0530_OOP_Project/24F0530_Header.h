@@ -62,6 +62,7 @@ struct Coords
 
 class Cursor
 {
+public:
 	Coords position; // character position , top left corner
 
 	Cursor(int x = 0, int y = 0);
@@ -72,7 +73,7 @@ class Cursor
 	void moveCursorLeft();
 	void moveCursorRight();
 	bool isOutOfBoundary(int x, int y);
-	void displayCursor();
+	void printCursor();
 };
 
 
@@ -190,10 +191,13 @@ class Game
 public:
 	Frame frame;
 	World world;
+	Cursor cursor;
 
 	Game();
 	void displayFrame();
 	void displayWorld();
+	void initializeCursor();
+	void displayCursor();
 };
 
 

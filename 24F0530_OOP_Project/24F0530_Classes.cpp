@@ -32,6 +32,8 @@ Game::Game()
 	world.loadPreset1();
 	displayWorld();
 	world.loadPreset1Labels();
+	initializeCursor();
+	displayCursor();
 	
 }
 
@@ -46,9 +48,48 @@ void Game::displayWorld()
 	world.display();
 }
 
+void Game::displayCursor()
+{
+	cursor.printCursor();
+}
+
+void Game::initializeCursor()
+{
+	int midX = (TILE_WIDTH * 20) + WORLD_START_X;
+	int midY = (TILE_LENGTH * 7) + WORLD_START_Y;
+
+	cursor.position.set(midX, midY);
+}
+
 Cursor::Cursor(int a, int b)
 {
 	position.set(a, b);
+}
+
+void Cursor::printCursor()
+{
+	int x = position.x;
+	int y = position.y;
+	gotoxy(x, y);
+	setColor(YELLOW);
+	for (int i = 0; i < TILE_LENGTH; i++)
+	{	
+		gotoxy(x, y+i);
+		if (i == 0 || i + 1 == TILE_LENGTH)
+		{
+			for (int j = 0; j < TILE_WIDTH; j++)
+			{
+				cout << "-";
+			}
+		}
+		else
+		{
+			cout << "|";
+			gotoxy(x + TILE_WIDTH - 1, y + i);
+			cout << "|";
+		}
+	}
+	setColor(DEFAULT);
 }
 
 void Cursor::moveCursor(int direction)
