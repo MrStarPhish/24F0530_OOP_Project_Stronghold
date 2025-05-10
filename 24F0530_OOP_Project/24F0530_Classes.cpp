@@ -11,6 +11,10 @@ void gotoxy(int x, int y);
 void setColor(int color);
 void hideConsoleCursor();
 
+bool requireGameRender = 0;
+string areaName[4] = { "EMPIRE-A", "EMPIRE-B", "BATTLEFIELD", "MARKET" };
+
+
 
 void Coords::set(int a, int b)
 {
@@ -105,6 +109,60 @@ void Game::initializeCursor()
 	int midY = (TILE_LENGTH * 7) + WORLD_START_Y;
 
 	cursor.position.set(midX, midY);
+}
+
+void Game::progress()
+{
+	// ticking all buildings
+	for (int i = 0; i < 40; i++)
+	{
+		for (int j = 0; j < 20; j++)
+		{
+
+		}
+	}
+}
+
+void Game::clearMenuArea()
+{
+	gotoxy(MENU_X, MENU_Y);
+	for (int i = 0; i < 10; i++)
+	{
+		gotoxy(MENU_X, MENU_Y+i);
+		cout << "                        ";
+	}
+}
+
+void Game::interactCursor()
+{
+	int x = cursor.position.x;
+	int y = cursor.position.y;
+	int tileX = x / TILE_WIDTH;
+	int tileY = (y / TILE_LENGTH) - 2;
+
+	if (world.tiles[tileY][tileX]->building) // if there exists a building
+	{
+		if (world.tiles[tileY][tileX]->building->type == 'F')
+		world.tiles[tileY][tileX]->building->printMenu();
+	}
+	else // if its a normal tile
+	{
+		clearMenuArea();
+	}
+}
+
+int Game::getCursorArea()
+{
+	int x = cursor.position.x; // positions in terms of tiles
+	int y = cursor.position.y;
+	if (x < 20 && y < 10) // EMPIRE-A
+		return EMPIREA;
+	if (x > 19 && y > 9) // EMPIRE-B
+		return EMPIREB;
+	if (x < 20 && y > 9) // Battlefield area
+		return BATTLEFIELD;
+	else // Neutral Area - Market Center
+		return MARKET;
 }
 
 Cursor::Cursor(int a, int b)
@@ -719,14 +777,76 @@ Building::Building(int w, int h, int x, int y, char c)
 	type = c;
 }
 void Building::displayBuilding() { }
+void Building::tick() { }
+void Building::upgrade() { }
+void Building::printMenu() { }
+
+int Building::getArea()
+{
+	int x = position.x; // positions in terms of tiles
+	int y = position.y;
+	if (x < 20 && y < 10) // EMPIRE-A
+		return EMPIREA;
+	if (x > 19 && y > 9) // EMPIRE-B
+		return EMPIREB;
+	if (x < 20 && y > 9) // Battlefield area
+		return BATTLEFIELD;
+	else // Neutral Area - Market Center
+		return MARKET;
+}
 
 
-Farm::Farm(int w, int h, int x, int y, char c)
+Farm::Farm(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Farm::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "FARM : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "FOOD: " << storedFood << " / " << cap;
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. COLLECT";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. UPGRADE";
+}
+
+void Farm::tick()
+{
+	if (storedFood < cap)
+	{
+		storedFood += productionRate;
+	}
+	if (storedFood > cap)
+		storedFood = cap;
+}
+
+void Farm::collect(Empire* target)
+{
+	target->economy->add("food", storedFood); // EMpire ko Food dedo, aur FARM mein reset krdo
+	storedFood = 0;
+}
+
+void Farm::upgrade()
+{
+	width++;
+	height++;
+	level++;
+	productionRate += 5;
+	cap += 250;
+
+	requireGameRender = 1;
 }
 
 void Farm::displayBuilding()

@@ -13,10 +13,13 @@ const int FRAME_Y_OFFSET = 5;
 const int WORLD_START_X = FRAME_X_OFFSET + 1;
 const int WORLD_START_Y = FRAME_Y_OFFSET + 1;
 
-
-
 const int TILE_WIDTH = 5;
 const int TILE_LENGTH = 3;
+
+const int MENU_X = 210;
+const int MENU_Y = 7;
+
+extern bool requireGameRender; // Took help here regarding 'extern' 
 
 
 void gotoxy(int x, int y);
@@ -49,6 +52,13 @@ enum Direction
 {
 	LEFT, RIGHT, UP, DOWN
 };
+
+enum Area
+{
+	EMPIREA, EMPIREB, BATTLEFIELD, MARKET
+};
+
+extern string areaName[4];
 
 struct Coords
 {
@@ -200,9 +210,11 @@ public:
 	void initializeCursor();
 	void displayCursor();
 	void renderAroundCursor();
+	int getCursorArea();
+	void interactCursor();
 
 	void keyPressed(char key);
-
+	void clearMenuArea();
 	void progress();
 };
 
@@ -240,8 +252,12 @@ public:
 
 	Building();
 	Building(int, int, int, int, char = '\0');
-	virtual void displayBuilding(); // #POLYMORPHISM
 
+	virtual void displayBuilding(); // #POLYMORPHISM
+	virtual void tick();
+	virtual void upgrade();
+	virtual void printMenu();
+	int getArea(); // to determine whether the building lies in area of Empire A or B...
 };
 
 
@@ -249,9 +265,18 @@ class Farm : public Building
 {
 public:
 	// Farm, source of revenue, variable size
+	int storedFood = 0;
+	int cap = 500;
+	int productionRate = 5;
+	int level;
+
 	Farm(int, int, int, int, char);
 
 	void displayBuilding();
+	void tick();
+	void collect(Empire* );
+	void upgrade();
+	void printMenu();
 };
 
 class Castle : public Building {

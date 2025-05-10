@@ -17,12 +17,18 @@ int main()
 
 	while (true)
 	{
-		//if (frame % 5)
-			//game.displayWorld();
+
+
+		if (requireGameRender)
+		{
+			game.displayWorld();
+			requireGameRender = 0;
+		}
 
 		key = _getch();
 		game.keyPressed(key);
 		game.displayCursor();
+		game.interactCursor();
 		game.displayLabels();
 
 		gotoxy(0, 70);
