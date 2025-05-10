@@ -45,7 +45,7 @@ enum Color
 
 enum Terrain
 {
-	PATH_X, PATH_Y, STRUCTURE, EMPTY
+	PATH_X, PATH_Y, STRUCTURE, STRUCTURE_MAIN, EMPTY
 };
 
 enum Direction
@@ -55,7 +55,7 @@ enum Direction
 
 enum Area
 {
-	EMPIREA, EMPIREB, BATTLEFIELD, MARKET
+	EMPIREA, EMPIREB, BATTLEFIELD, TRADECENTER
 };
 
 extern string areaName[4];
@@ -274,47 +274,62 @@ public:
 
 	void displayBuilding();
 	void tick();
+	void printMenu();
 	void collect(Empire* );
 	void upgrade();
-	void printMenu();
 };
 
 class Castle : public Building {
 public:
 	// A 3x3 building be default
+	int level;
 	Castle(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
+	void tick();
+	void printMenu();
 };
 
 class Barracks : public Building {
 public:
 	// A big building that represents soldiers 2x3 by default
+	int level;
 	Barracks(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
+	void tick();
+	void printMenu();
 };
 
 class Market : public Building {
 public:
 	// A big building that represents soldiers 2x3 by default
+	int level;
 	Market(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
+	void tick();
+	void printMenu();
 };
 
 class Tradepost : public Building {
 public:
 	// A big building that represents soldiers 2x3 by default
+	int level;
 	Tradepost(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
+	void tick();
+	void printMenu();
 };
 
 class Bank : public Building {
 public:
 	// A big building that represents soldiers 2x3 by default
+	int level;
 	Bank(int w, int h, int x, int y, char c);
 
 	void displayBuilding();
+	void tick();
+	void printMenu();
 };

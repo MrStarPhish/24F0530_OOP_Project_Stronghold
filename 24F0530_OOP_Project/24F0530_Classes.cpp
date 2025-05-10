@@ -12,7 +12,7 @@ void setColor(int color);
 void hideConsoleCursor();
 
 bool requireGameRender = 0;
-string areaName[4] = { "EMPIRE-A", "EMPIRE-B", "BATTLEFIELD", "MARKET" };
+string areaName[4] = { "EMPIRE-A", "EMPIRE-B", "BATTLEFIELD", "TRADE CENTER" };
 
 
 
@@ -118,7 +118,10 @@ void Game::progress()
 	{
 		for (int j = 0; j < 20; j++)
 		{
-
+			if (world.tiles[i][j]->type == STRUCTURE_MAIN) // if building, then tick it
+			{
+				world.tiles[i][j]->building->tick();
+			}
 		}
 	}
 }
@@ -142,7 +145,7 @@ void Game::interactCursor()
 
 	if (world.tiles[tileY][tileX]->building) // if there exists a building
 	{
-		if (world.tiles[tileY][tileX]->building->type == 'F')
+		/*if (world.tiles[tileY][tileX]->building->type == 'F')*/
 		world.tiles[tileY][tileX]->building->printMenu();
 	}
 	else // if its a normal tile
@@ -162,7 +165,7 @@ int Game::getCursorArea()
 	if (x < 20 && y > 9) // Battlefield area
 		return BATTLEFIELD;
 	else // Neutral Area - Market Center
-		return MARKET;
+		return TRADECENTER;
 }
 
 Cursor::Cursor(int a, int b)
@@ -549,13 +552,15 @@ void World::placeBuilding(Building* b)
 	int width = b->width;   // storing the size in terms of Tiles 
 	int height = b->height; 
 
-	for (int i = 0; i < height; ++i) {
-		for (int j = 0; j < width; ++j) {
+	for (int i = 0; i < height; i++) 
+	{
+		for (int j = 0; j < width; j++) 
+		{
 			int tileY = startY + i;
 			int tileX = startX + j;
 
 			
-			if (tileY >= (FRAME_ROWS / TILE_LENGTH) || tileX >= (FRAME_COLS / TILE_WIDTH)) // Out-of-Bound check
+			if (tileY >= (FRAME_ROWS / TILE_LENGTH) || tileX >= (FRAME_COLS / TILE_WIDTH)) // Out of Bound checking here
 				cout << "ERROR: TILE INPUT GOING OUT OF BOUNDARY";
 
 			tiles[tileY][tileX]->isOccupied = true; // updating info of those tiles
@@ -563,6 +568,7 @@ void World::placeBuilding(Building* b)
 			tiles[tileY][tileX]->type = STRUCTURE;
 		}
 	}
+	tiles[startY][startX]->type = STRUCTURE_MAIN;
 }
 
 void World::createTiles()
@@ -792,7 +798,7 @@ int Building::getArea()
 	if (x < 20 && y > 9) // Battlefield area
 		return BATTLEFIELD;
 	else // Neutral Area - Market Center
-		return MARKET;
+		return TRADECENTER;
 }
 
 
@@ -885,13 +891,37 @@ void Farm::displayBuilding()
 	cout << setw(w-2) << left <<"FARM";
 }
 
-Castle::Castle(int w, int h, int x, int y, char c)
+Castle::Castle(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
 }
+
+void Castle::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "CASTLE : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "STAT: " << "x" << " / " << "y";
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. ACTION_1";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. ACTION_2";
+}
+
+void Castle::tick()
+{
+	// TO be Continued
+}
+
 
 void Castle::displayBuilding()
 {
@@ -936,12 +966,35 @@ void Castle::displayBuilding()
 	cout << setw(w - 2) << left << "CASTLE";
 }
 
-Barracks::Barracks(int w, int h, int x, int y, char c)
+Barracks::Barracks(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Barracks::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "BARRACKS : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "STAT: " << "x" << " / " << "y";
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. ACTION_1";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. ACTION_2";
+}
+
+void Barracks::tick()
+{
+	// TO be Continued
 }
 
 void Barracks::displayBuilding()
@@ -980,12 +1033,35 @@ void Barracks::displayBuilding()
 	cout << setw(w - 2) << left << "BARRACKS";
 }
 
-Market::Market(int w, int h, int x, int y, char c)
+Market::Market(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Market::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "MARKET : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "STAT: " << "x" << " / " << "y";
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. ACTION_1";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. ACTION_2";
+}
+
+void Market::tick()
+{
+	// TO be Continued
 }
 
 void Market::displayBuilding()
@@ -1024,12 +1100,35 @@ void Market::displayBuilding()
 	cout << setw(w - 2) << left << "MARKET";
 }
 
-Tradepost::Tradepost(int w, int h, int x, int y, char c)
+Tradepost::Tradepost(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Tradepost::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "TRADEPOST : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "STAT: " << "x" << " / " << "y";
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. ACTION_1";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. ACTION_2";
+}
+
+void Tradepost::tick()
+{
+	// TO be Continued
 }
 
 void Tradepost::displayBuilding()
@@ -1068,12 +1167,35 @@ void Tradepost::displayBuilding()
 	cout << setw(w - 2) << left << "TRADEPOST";
 }
 
-Bank::Bank(int w, int h, int x, int y, char c)
+Bank::Bank(int w, int h, int x, int y, char c) : level(1)
 {
 	width = w;
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Bank::printMenu()
+{
+	int temp = getArea();
+
+	gotoxy(MENU_X, MENU_Y);
+	cout << "BANK : " << areaName[temp];
+	gotoxy(MENU_X, MENU_Y + 1);
+	cout << "LEVEL: " << level;
+	gotoxy(MENU_X, MENU_Y + 2);
+	cout << "SIZE: " << height << " x " << width;
+	gotoxy(MENU_X, MENU_Y + 3);
+	cout << "STAT: " << "x" << " / " << "y";
+	gotoxy(MENU_X, MENU_Y + 5);
+	cout << "1. ACTION_1";
+	gotoxy(MENU_X, MENU_Y + 6);
+	cout << "2. ACTION_2";
+}
+
+void Bank::tick()
+{
+	// TO be Continued
 }
 
 void Bank::displayBuilding()
