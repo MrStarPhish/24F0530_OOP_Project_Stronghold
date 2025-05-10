@@ -84,7 +84,11 @@ void Game::keyPressed(char key)
 		world.displayEconomies();
 		break;
 	case '2':
-		// Action 2
+		// ACTION 2
+		if (world.tiles[tileY][tileX]->building)
+		{
+			world.tiles[tileY][tileX]->building->upgrade();
+		}
 		break;
 	}
 }
