@@ -17,23 +17,27 @@ int main()
 
 	while (true)
 	{
-
+		if (frame % 25) // tick rate 
+			game.progress();
 
 		if (requireGameRender)
 		{
 			game.displayWorld();
 			requireGameRender = 0;
 		}
+		if (key = _kbhit())
+		{
+			key = _getch();
+			game.keyPressed(key);
 
-		key = _getch();
-		game.keyPressed(key);
+		}
 		game.displayCursor();
 		game.interactCursor();
 		game.displayLabels();
 
 		gotoxy(0, 70);
 		frame++;
-		//Sleep(5);
+		Sleep(100);
 	}
 	
 

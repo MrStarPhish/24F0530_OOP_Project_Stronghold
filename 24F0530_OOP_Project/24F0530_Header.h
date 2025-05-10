@@ -212,6 +212,7 @@ public:
 	void renderAroundCursor();
 	int getCursorArea();
 	void interactCursor();
+	void clearTopHud();
 
 	void keyPressed(char key);
 	void clearMenuArea();
@@ -258,6 +259,7 @@ public:
 	virtual void upgrade();
 	virtual void printMenu();
 	int getArea(); // to determine whether the building lies in area of Empire A or B...
+	virtual void collect(Empire* ); // Action 1
 };
 
 
@@ -288,6 +290,8 @@ public:
 	void displayBuilding();
 	void tick();
 	void printMenu();
+	void collect(Empire*);
+
 };
 
 class Barracks : public Building {
@@ -299,6 +303,8 @@ public:
 	void displayBuilding();
 	void tick();
 	void printMenu();
+	void collect(Empire*);
+
 };
 
 class Market : public Building {
@@ -310,6 +316,8 @@ public:
 	void displayBuilding();
 	void tick();
 	void printMenu();
+	void collect(Empire*);
+
 };
 
 class Tradepost : public Building {
@@ -321,6 +329,8 @@ public:
 	void displayBuilding();
 	void tick();
 	void printMenu();
+	void collect(Empire*);
+
 };
 
 class Bank : public Building {
@@ -332,4 +342,6 @@ public:
 	void displayBuilding();
 	void tick();
 	void printMenu();
+	void collect(Empire*);
+
 };

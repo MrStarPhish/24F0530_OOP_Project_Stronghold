@@ -43,6 +43,12 @@ Game::Game()
 
 void Game::keyPressed(char key)
 {
+	int x = cursor.position.x;
+	int y = cursor.position.y;
+	int tileX = x / TILE_WIDTH;
+	int tileY = (y / TILE_LENGTH) - 2;
+
+	
 	renderAroundCursor();
 
 	switch (key)
@@ -62,6 +68,23 @@ void Game::keyPressed(char key)
 	case 'w':
 	case 'W':
 		cursor.moveCursor(UP);
+		break;
+	case '1':
+		// Action 1
+		if (world.tiles[tileY][tileX]->building)
+		{
+			int temp1 = getCursorArea(); // to store the Empire that is active/being active by Cursor
+
+			if (temp1==EMPIREA)
+				world.tiles[tileY][tileX]->building->collect(world.empireA);
+			else if (temp1 == EMPIREB)
+				world.tiles[tileY][tileX]->building->collect(world.empireB);
+		}
+		clearTopHud();
+		world.displayEconomies();
+		break;
+	case '2':
+		// Action 2
 		break;
 	}
 }
@@ -111,12 +134,22 @@ void Game::initializeCursor()
 	cursor.position.set(midX, midY);
 }
 
+void Game::clearTopHud()
+{
+	gotoxy(0, 0);
+	for (int i = 0; i < 5; i++)
+	{
+		gotoxy(0, 0 + i);
+		cout << "                                                                                                                  ";
+	}
+}
+
 void Game::progress()
 {
 	// ticking all buildings
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < 20; i++)
 	{
-		for (int j = 0; j < 20; j++)
+		for (int j = 0; j < 40; j++)
 		{
 			if (world.tiles[i][j]->type == STRUCTURE_MAIN) // if building, then tick it
 			{
@@ -156,8 +189,8 @@ void Game::interactCursor()
 
 int Game::getCursorArea()
 {
-	int x = cursor.position.x; // positions in terms of tiles
-	int y = cursor.position.y;
+	int x = cursor.position.x/TILE_WIDTH; // positions in terms of tiles
+	int y = cursor.position.y/TILE_LENGTH;
 	if (x < 20 && y < 10) // EMPIRE-A
 		return EMPIREA;
 	if (x > 19 && y > 9) // EMPIRE-B
@@ -786,6 +819,7 @@ void Building::displayBuilding() { }
 void Building::tick() { }
 void Building::upgrade() { }
 void Building::printMenu() { }
+void Building::collect(Empire* ) { }
 
 int Building::getArea()
 {
@@ -899,6 +933,11 @@ Castle::Castle(int w, int h, int x, int y, char c) : level(1)
 	type = c;
 }
 
+void Castle::collect(Empire* target)
+{
+	//
+}
+
 void Castle::printMenu()
 {
 	int temp = getArea();
@@ -974,6 +1013,11 @@ Barracks::Barracks(int w, int h, int x, int y, char c) : level(1)
 	type = c;
 }
 
+void Barracks::collect(Empire* target)
+{
+	//
+}
+
 void Barracks::printMenu()
 {
 	int temp = getArea();
@@ -1039,6 +1083,11 @@ Market::Market(int w, int h, int x, int y, char c) : level(1)
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Market::collect(Empire* target)
+{
+	//
 }
 
 void Market::printMenu()
@@ -1108,6 +1157,11 @@ Tradepost::Tradepost(int w, int h, int x, int y, char c) : level(1)
 	type = c;
 }
 
+void Tradepost::collect(Empire* target)
+{
+	//
+}
+
 void Tradepost::printMenu()
 {
 	int temp = getArea();
@@ -1173,6 +1227,11 @@ Bank::Bank(int w, int h, int x, int y, char c) : level(1)
 	height = h;
 	position.set(x, y); // in terms of Tile
 	type = c;
+}
+
+void Bank::collect(Empire* target)
+{
+	//
 }
 
 void Bank::printMenu()
