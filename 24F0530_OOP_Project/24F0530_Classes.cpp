@@ -87,7 +87,7 @@ void Game::keyPressed(char key)
 		// ACTION 2
 		if (world.tiles[tileY][tileX]->building)
 		{
-			world.tiles[tileY][tileX]->building->upgrade();
+			world.tiles[tileY][tileX]->building->upgrade(); // checkpoint , need to work on this logic 
 		}
 		break;
 	}
@@ -884,6 +884,7 @@ void Farm::collect(Empire* target)
 
 void Farm::upgrade()
 {
+
 	width++;
 	height++;
 	level++;
