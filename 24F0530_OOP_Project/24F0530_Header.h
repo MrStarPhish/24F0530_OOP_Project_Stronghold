@@ -196,8 +196,14 @@ public:
 	Game();
 	void displayFrame();
 	void displayWorld();
+	void displayLabels();
 	void initializeCursor();
 	void displayCursor();
+	void renderAroundCursor();
+
+	void keyPressed(char key);
+
+	void progress();
 };
 
 

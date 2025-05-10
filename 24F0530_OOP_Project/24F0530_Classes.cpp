@@ -37,6 +37,30 @@ Game::Game()
 	
 }
 
+void Game::keyPressed(char key)
+{
+	renderAroundCursor();
+
+	switch (key)
+	{
+	case 'a':
+	case 'A':
+		cursor.moveCursor(LEFT);
+		break;
+	case 's':
+	case 'S':
+		cursor.moveCursor(DOWN);
+		break;
+	case 'd':
+	case 'D':
+		cursor.moveCursor(RIGHT);
+		break;
+	case 'w':
+	case 'W':
+		cursor.moveCursor(UP);
+		break;
+	}
+}
 
 void Game::displayFrame()
 {
@@ -51,6 +75,28 @@ void Game::displayWorld()
 void Game::displayCursor()
 {
 	cursor.printCursor();
+}
+
+void Game::displayLabels()
+{
+	world.loadPreset1Labels();
+}
+
+void Game::renderAroundCursor()
+{
+	int x = cursor.position.x;
+	int y = cursor.position.y;
+	int tileX = x / TILE_WIDTH;
+	int tileY = (y / TILE_LENGTH) - 2;
+
+	if (world.tiles[tileY][tileX]->building) // if there exists a building
+	{
+		world.tiles[tileY][tileX]->building->displayBuilding();
+	}
+	else // if its a normal tile
+	{
+		world.tiles[tileY][tileX]->displayTile();
+	}
 }
 
 void Game::initializeCursor()
@@ -94,6 +140,7 @@ void Cursor::printCursor()
 
 void Cursor::moveCursor(int direction)
 {
+
 	switch (direction)
 	{
 	case UP:
@@ -115,17 +162,17 @@ bool Cursor::isOutOfBoundary(int x, int y)
 {	// AGar boudnary se baahir jaye toh return 1, warna return 0
 	int topBound = WORLD_START_Y;
 	int leftBound = WORLD_START_X;
-	int rightBound = (leftBound)+(FRAME_COLS * ((FRAME_COLS / TILE_WIDTH) - 1));
-	int bottomBound = (topBound)+(FRAME_ROWS * ((FRAME_ROWS / TILE_LENGTH) - 1));
+	int rightBound = 196; // manually setting boundary for now
+	int bottomBound = 63;
 
-	if (x > rightBound)
+	if ( (x > rightBound) || (x < leftBound) || (y > bottomBound) || (y < topBound) )
 		return 1;
-	if (x < leftBound)
+	/*if (x < leftBound)
 		return 1;
 	if (y > bottomBound)
 		return 1;
 	if (y < topBound)
-		return 1;
+		return 1;*/
 
 	return 0;
 
@@ -706,7 +753,10 @@ void Farm::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
@@ -754,7 +804,10 @@ void Castle::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
@@ -795,7 +848,10 @@ void Barracks::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
@@ -836,7 +892,10 @@ void Market::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
@@ -877,7 +936,10 @@ void Tradepost::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
@@ -918,7 +980,10 @@ void Bank::displayBuilding()
 		else
 		{
 			cout << "|";
-			gotoxy(x + w - 1, y + i);
+			for (int j = 0; j < w - 2; j++)
+			{
+				cout << " ";
+			}
 			cout << "|";
 		}
 	}
