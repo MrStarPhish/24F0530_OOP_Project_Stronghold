@@ -598,7 +598,7 @@ void World::placeBuilding(Building* b)
 
 			
 			if (tileY >= (FRAME_ROWS / TILE_LENGTH) || tileX >= (FRAME_COLS / TILE_WIDTH)) // Out of Bound checking here
-				cout << "ERROR: TILE INPUT GOING OUT OF BOUNDARY";
+				cout << "ERROR: TILE INPUT GOING OUT OF BOUNDARY # 24F0530";
 
 			tiles[tileY][tileX]->isOccupied = true; // updating info of those tiles
 			tiles[tileY][tileX]->building = b;
