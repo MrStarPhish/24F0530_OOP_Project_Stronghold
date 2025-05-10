@@ -13,21 +13,27 @@ const int FRAME_Y_OFFSET = 5;
 const int WORLD_START_X = FRAME_X_OFFSET + 1;
 const int WORLD_START_Y = FRAME_Y_OFFSET + 1;
 
+
+
 const int TILE_WIDTH = 5;
 const int TILE_LENGTH = 3;
 
 
 void gotoxy(int x, int y);
 void setColor(int color);
-void hideCursor();
+void hideConsoleCursor();
 
 
 struct Coords;
 class Game;
 class Frame;
+class Cursor;
 class World;
+class Empire;
 class Tile;
 class Building;
+class Economy;
+
 
 enum Color
 {
@@ -39,6 +45,11 @@ enum Terrain
 	PATH_X, PATH_Y, STRUCTURE, EMPTY
 };
 
+enum Direction
+{
+	LEFT, RIGHT, UP, DOWN
+};
+
 struct Coords
 {
 	// basic struct for storing coordinates
@@ -47,6 +58,21 @@ struct Coords
 	Coords(int, int);
 	void set(int a, int b);
 
+};
+
+class Cursor
+{
+	Coords position; // character position , top left corner
+
+	Cursor(int x = 0, int y = 0);
+
+	void moveCursor(int direction);
+	void moveCursorUp();
+	void moveCursorDown();
+	void moveCursorLeft();
+	void moveCursorRight();
+	bool isOutOfBoundary(int x, int y);
+	void displayCursor();
 };
 
 
@@ -61,12 +87,78 @@ public:
 	void display();
 };
 
+template <typename T> // # TEMPLATE
+class Resource
+{
+public:
+	T quantity;
+
+	Resource();
+	Resource(int);
+	void set(T q);
+	void add(T q);
+	bool consume(T q);
+	T get();
+};
+
+class Economy {
+public:
+	Resource<int> food, wood, weapons;
+	Resource<float> stone, gold;
+	
+	Economy(int = 0, int = 0, int = 0, float = 0, float = 0);
+
+	void displayResources(int x = 0, int y = 0) const;
+	void add(string resource, int amount);
+	bool consume(string resource, int amount);   // successfully consume ho jaye toh TRUE return ho jaye ga
+};
+
+class Population
+{
+public:
+	int happiness;
+	int hunger;
+	int employment;
+};
+
+class Army
+{
+	int soldierCount;
+	int morale, trainedUnits;
+};
+
+class Politics
+{
+	float tax;
+	int kingLeadershipStyle;
+};
+
+class Empire
+{
+public:
+	const int EMPIRE_STATS_X; // # CONSTANT
+	const int EMPIRE_STATS_Y;
+	Coords position; // starting position in terms of tiles
+	Politics *politics;
+	Army *army;
+	Population *population;
+	Economy *economy;
+
+	Empire();
+	Empire(int x, int y, int a, int b, Economy* = NULL, Politics* = NULL, Army* = NULL, Population* = NULL ); // character position in World, and character position of STATS
+	~Empire();
+	void displayEconomy();
+};
+
 class World
 {
 public:
-	// FRAME ke andar jo saara gameplay ho ga
+	// FRAME ke andar jo saara gameplay ho ga, basically the actual Gameplay
+
 	const Coords starting; // start inside the Frame
 	Tile*** tiles; // 2D array of Tiles Pointer
+	Empire *empireA;
+	Empire *empireB;
 
 	World();
 	~World();
@@ -81,7 +173,15 @@ public:
 	void placeBuilding(Building*);
 	Building* createBuilding(int, int, int, int, char);
 	void displayBuildings();
+
+	void initializeEmpires();
+	void initializeEmpireA();
+	void initializeEmpireB();
+	void displayEconomies();
+
 };
+
+
 
 class Game
 {
@@ -118,6 +218,8 @@ public:
 	void displayPathYTile();
 
 };
+
+
 
 class Building
 {

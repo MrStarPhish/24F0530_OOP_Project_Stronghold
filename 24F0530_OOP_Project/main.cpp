@@ -6,7 +6,7 @@ using namespace std;
 
 int main()
 {
-	hideCursor();
+	hideConsoleCursor();
 	ios::sync_with_stdio(false);
 
 	Game game;

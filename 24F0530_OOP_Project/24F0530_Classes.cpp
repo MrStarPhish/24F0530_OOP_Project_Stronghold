@@ -9,7 +9,7 @@ using namespace std;
 
 void gotoxy(int x, int y);
 void setColor(int color);
-void hideCursor();
+void hideConsoleCursor();
 
 
 void Coords::set(int a, int b)
@@ -46,6 +46,91 @@ void Game::displayWorld()
 	world.display();
 }
 
+Cursor::Cursor(int a, int b)
+{
+	position.set(a, b);
+}
+
+void Cursor::moveCursor(int direction)
+{
+	switch (direction)
+	{
+	case UP:
+		moveCursorUp();
+		break;
+	case DOWN:
+		moveCursorDown();
+		break;
+	case LEFT:
+		moveCursorLeft();
+		break;
+	case RIGHT:
+		moveCursorRight();
+		break;
+	}
+}
+
+bool Cursor::isOutOfBoundary(int x, int y)
+{	// AGar boudnary se baahir jaye toh return 1, warna return 0
+	int topBound = WORLD_START_Y;
+	int leftBound = WORLD_START_X;
+	int rightBound = (leftBound)+(FRAME_COLS * ((FRAME_COLS / TILE_WIDTH) - 1));
+	int bottomBound = (topBound)+(FRAME_ROWS * ((FRAME_ROWS / TILE_LENGTH) - 1));
+
+	if (x > rightBound)
+		return 1;
+	if (x < leftBound)
+		return 1;
+	if (y > bottomBound)
+		return 1;
+	if (y < topBound)
+		return 1;
+
+	return 0;
+
+}
+
+void Cursor::moveCursorUp()
+{
+	int newX = position.x + 0;
+	int newY = position.y - 3;
+	if (!isOutOfBoundary(newX, newY))
+	{
+		position.x = newX;
+		position.y = newY;
+	}
+}
+void Cursor::moveCursorDown()
+{
+	int newX = position.x + 0;
+	int newY = position.y + 3;
+	if (!isOutOfBoundary(newX, newY))
+	{
+		position.x = newX;
+		position.y = newY;
+	}
+}
+void Cursor::moveCursorLeft()
+{
+	int newX = position.x - 5;
+	int newY = position.y + 0;
+	if (!isOutOfBoundary(newX, newY))
+	{
+		position.x = newX;
+		position.y = newY;
+	}
+}
+void Cursor::moveCursorRight()
+{
+	int newX = position.x + 5;
+	int newY = position.y + 0;
+	if (!isOutOfBoundary(newX, newY))
+	{
+		position.x = newX;
+		position.y = newY;
+	}
+}
+
 Frame::Frame()
 {
 	width = FRAME_COLS;
@@ -80,10 +165,84 @@ void Frame::display()
 	}
 }
 
+template <typename T>
+Resource<T>::Resource()
+{
+	quantity = 0;
+}
+
+template <typename T>
+Resource<T>::Resource(int q)
+{
+	quantity = q;
+}
+template <typename T>
+void Resource<T>::set(T q) { quantity = q; }
+template <typename T>
+void Resource<T>::add(T q) { quantity += q; }
+
+template <typename T>
+bool Resource<T>::consume(T q) // agar successfully consume ho jaye, toh 1 return krdo
+{
+	if (quantity >= q)
+	{
+		quantity -= q;
+		return 1;
+	}
+	return 0;
+}
+
+template <typename T>
+T Resource<T>::get() { return quantity; }
+
+Economy::Economy(int food, int wood, int weapons, float stone, float gold)
+{
+	this->food.set(food);
+	this->wood.set(wood);
+	this->weapons.set(weapons);
+	this->stone.set(stone);
+	this->gold.set(gold);
+}
+
+void Economy::displayResources(int x, int y) const
+{
+	gotoxy(x, y);
+	cout << "Food: " << food.quantity;
+	//gotoxy(x, y + 1);
+	cout << " | Wood: " << wood.quantity;
+	//gotoxy(x, y + 2);
+	cout << " | Stone: " << stone.quantity;
+	//gotoxy(x, y + 3);
+	cout << " | Gold: " << gold.quantity;
+	//gotoxy(x, y + 4);
+	cout << " | Weapons: " << weapons.quantity;
+}
+
+void Economy::add(string resource, int amount)
+{
+	if (resource == "food") food.add(amount);
+	else if (resource == "wood") wood.add(amount);
+	else if (resource == "stone") stone.add(amount);
+	else if (resource == "gold") gold.add(amount);
+	else if (resource == "weapons") weapons.add(amount);
+}
+
+bool Economy::consume(string resource, int amount)   // successfully consume ho jaye toh TRUE return ho jaye ga
+{
+	if (resource == "food") return food.consume(amount);
+	if (resource == "wood") return wood.consume(amount);
+	if (resource == "stone") return stone.consume(amount);
+	if (resource == "gold") return gold.consume(amount);
+	if (resource == "weapons") return weapons.consume(amount);
+	return 0;
+}
+
+
 World::World() : starting(WORLD_START_X, WORLD_START_Y)
 {
 	createTiles();
 	initializeTiles();
+	initializeEmpires();
 }
 
 void World::loadPreset1Labels()
@@ -167,17 +326,19 @@ void World::loadPreset1()
 	Building* tradePost = createBuilding(2, 2, maxCols - 9, 7, 'T');   // 'T' for Trade Post
 	placeBuilding(tradePost);
 
-	Building* bank = createBuilding(2, 2, maxCols - 9, 2, 'N');       // 'B' for Bank
+	Building* bank = createBuilding(2, 2, maxCols - 9, 2, 'N');       // 'N' for Bank
 	placeBuilding(bank);
 
 	
 }
 
 
+
 void World::display()
 {
 	displayTiles();
 	displayBuildings();
+	displayEconomies();
 }
 
 void World::displayBuildings()
@@ -206,6 +367,17 @@ void World::displayTiles()
 			tiles[i][j]->displayTile();
 		}
 	}
+
+}
+
+void World::displayEconomies()
+{
+	gotoxy(0, 0);
+	cout << "EMPIRE-A Stats:-";
+	empireA->displayEconomy();
+	gotoxy(0, 2);
+	cout << "EMPIRE-B Stats:-";
+	empireB->displayEconomy();
 }
 
 World::~World()
@@ -219,9 +391,13 @@ World::~World()
 		delete[] tiles[i];
 	}
 	delete[] tiles;
+
+	delete empireA;
+	delete empireB;
 }
 
-void World::placeBuilding(Building* b) {
+void World::placeBuilding(Building* b)
+{
 	int startX = b->position.x; // Storing indexes of starting Tiles
 	int startY = b->position.y;
 	int width = b->width;   // storing the size in terms of Tiles 
@@ -253,6 +429,27 @@ void World::createTiles()
 	{
 		tiles[i] = new Tile * [cols];
 	}
+}
+
+void World::initializeEmpires()
+{
+	initializeEmpireA();
+	initializeEmpireB();
+}
+
+void World::initializeEmpireA()
+{
+	// Loading presets of Empire Stats here. Initialize them here, and pass them into the empireA constructor below.
+	Economy* eco = new Economy(200, 300, 400, 500, 600);
+
+	empireA = new Empire(0, 0, 10, 1, eco);
+}
+
+void World::initializeEmpireB()
+{
+	Economy* eco = new Economy(200, 300, 400, 500, 600);
+
+	empireB = new Empire(0, 0, 10, 3, eco);
 }
 
 void World::initializeTiles()
@@ -390,6 +587,34 @@ Building* World::createBuilding(int w, int h, int x, int y, char c)
 		return nullptr;
 	}
 }
+
+
+Empire::Empire() : EMPIRE_STATS_X(0) , EMPIRE_STATS_Y(0)
+{
+	position.set(0, 0);
+}
+
+Empire::Empire(int x, int y, int a, int b, Economy* e, Politics* p, Army* ar, Population* pop) : EMPIRE_STATS_X(a), EMPIRE_STATS_Y(b)
+{
+	position.set(x, y);
+	economy = e;
+	politics = p;
+	army = ar;
+	population = pop;
+}
+Empire::~Empire()
+{
+	delete politics;
+	delete army;
+	delete population;
+	delete economy;
+}
+void Empire::displayEconomy()
+{
+	economy->displayResources(EMPIRE_STATS_X, EMPIRE_STATS_Y);
+}
+
+
 
 
 Building::Building()
@@ -691,7 +916,7 @@ void setColor(int color)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-void hideCursor()
+void hideConsoleCursor()
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO cursorInfo;
